@@ -2,7 +2,7 @@
 
 This is a simple but very useful project that when you run will scan all the content (tv shows os movies) from the website [https://comandotorrent.info](https://comandotorrent.info) into a sqlite file. 
 
-It's easy to run and you can checkout how [here](#run). But if you only need the data, just download the [Database.sqlite3 file from the latest release](https://github.com/Theryston/comandotorrent.info-indexer/releases/latest).
+It's easy to run and you can checkout how [here](#run). But if you only need the data, just download the `Database.sqlite3` file from the [latest release](https://github.com/Theryston/comandotorrent.info-indexer/releases/latest).
 
 ## Run
 
