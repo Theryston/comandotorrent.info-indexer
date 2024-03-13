@@ -15,13 +15,14 @@
     "axios": "^1.6.7",
     "better-sqlite3": "^9.4.3",
     "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.1",
     "fastq": "^1.17.1",
     "tsx": "^4.7.1",
     "uuid": "^9.0.1"
   },
   "scripts": {
-    "dev": "tsx index.ts",
+    "start": "tsx index.ts",
     "migration:generate": "drizzle-kit generate:sqlite",
     "migration:run": "tsx db/migrate.ts"
   }

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import axios from "axios";
 
 if (!process.env.BRIGHTDATA_USERNAME) {
