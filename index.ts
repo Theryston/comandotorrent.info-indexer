@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { CONCURRENT_HANDLE_PAGE, SITEMAP_INDEX } from "./constants";
 import db from "./db";
 import { pages } from "./db/schema";
@@ -11,20 +11,35 @@ import { promise as fastq } from "fastq";
 const queue = fastq(handlePage, CONCURRENT_HANDLE_PAGE)
 
 async function main() {
-    logger('Getting all post sitemaps...')
+    logger(`Getting all sitemaps from ${SITEMAP_INDEX}`);
     const postSitemaps = await getPostSitemap(SITEMAP_INDEX);
-    logger(`Found ${postSitemaps.length} post sitemaps`)
 
     for (const postSitemap of postSitemaps) {
-        logger(`Getting pages from sitemap ${postSitemap}`)
         const gotPages = await getPagesFromPostSitemap(postSitemap);
-        await db.insert(pages).values(gotPages.map(page => ({ url: page, status: 0, statusText: 'Pending' })));
-        logger(`Found ${gotPages.length} pages`)
+
+        for (const page of gotPages) {
+            const alreadyIndexedPages = await db
+                .select({ id: pages.id })
+                .from(pages)
+                .where(eq(pages.url, page));
+            3723
+            if (alreadyIndexedPages.length) {
+                logger(`Page ${page} already indexed`)
+                continue
+            }
+
+            await db.insert(pages).values({ url: page, status: 0, statusText: 'Pending' });
+            logger(`Page ${page} was indexed`)
+        }
     }
 
-    const pendingPages = await db.select().from(pages).where(eq(pages.status, 0))
-    for (let i = 0; i < pendingPages.length; i++) {
-        const page = pendingPages[i]
+    const indexedPendingPages = await db
+        .select({ url: pages.url })
+        .from(pages)
+        .where(or(eq(pages.status, 0), eq(pages.status, 2)));
+
+    for (let i = 0; i < indexedPendingPages.length; i++) {
+        const page = indexedPendingPages[i]
 
         if (!page.url) {
             continue
@@ -32,10 +47,10 @@ async function main() {
 
         queue.push(page.url)
             .then(() => {
-                logger(`Page ${i} of ${pendingPages.length} handled`)
+                logger(`Torrents from page ${i + 1} of ${indexedPendingPages.length} indexed`)
             })
             .catch(error => {
-                logger(`Error on page ${i}: ${error.message}`)
+                logger(`Error on page ${page.url}\n: ${error.message}`)
             })
     }
 }

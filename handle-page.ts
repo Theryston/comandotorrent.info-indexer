@@ -20,9 +20,7 @@ export default async function handlePage(page: string) {
             return;
         }
 
-        logger(`Getting infos from page ${page}`);
         const info = await getInfosFromPage(page);
-        logger(`Got infos from page ${page}`);
 
         for (const torrent of info.torrents) {
             await db.insert(torrents).values({ torrentTitle: torrent.torrentTitle, title: info.title, magnet: torrent.magnet });
@@ -30,9 +28,8 @@ export default async function handlePage(page: string) {
 
         await db.update(pages).set({ status: 1, statusText: 'OK' }).where(eq(pages.url, page));
 
-        logger(`Page ${page} handled successfully`);
     } catch (error: any) {
         await db.update(pages).set({ status: 2, statusText: error.message || 'Unknown error' }).where(eq(pages.url, page));
-        logger(`Error on page ${page}: ${error.message}`);
+        throw error
     }
 }

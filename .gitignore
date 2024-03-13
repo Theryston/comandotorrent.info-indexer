@@ -174,8 +174,8 @@ dist
 # Finder (MacOS) folder config
 .DS_Store
 
-# SQLite
-*.sqlite3
+# SQLite3
+*.sqlite3*
 
 # Envs
 .env
