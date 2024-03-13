@@ -10,9 +10,10 @@ export default async function getInfosFromPage(page: string) {
     const title = $('h1').text().trim();
 
     const magnets = $('a[href^="magnet:"]').toArray();
+    const imdbId = $('a[href^="https://www.imdb.com/title/"]').attr('href')?.split('/').pop();
 
     const torrents: {
-        torrentTitle: string
+        torrentTitle?: string
         magnet: string
     }[] = [];
 
@@ -23,16 +24,17 @@ export default async function getInfosFromPage(page: string) {
             continue;
         }
 
-        const torrentTitle = new URL(uri).searchParams.get('dn') || '';
+        const torrentTitle = new URL(uri).searchParams.get('dn');
 
         torrents.push({
-            torrentTitle,
+            torrentTitle: torrentTitle || undefined,
             magnet: $(magnet).attr('href') || ''
         })
     }
 
     return {
-        title,
+        imdbId,
+        pageTitle: title,
         torrents
     }
 }
