@@ -10,7 +10,10 @@ export default async function getInfosFromPage(page: string) {
     const title = $('h1').text().trim();
 
     const magnets = $('a[href^="magnet:"]').toArray();
-    const imdbId = $('a[href^="https://www.imdb.com/title/"]').attr('href')?.split('/').pop();
+    const imdbId = $('a[href^="https://www.imdb.com/title/"]')
+        .attr('href')
+        ?.split('https://www.imdb.com/title/')[1]
+        ?.split('/')[0]
 
     const torrents: {
         torrentTitle?: string
