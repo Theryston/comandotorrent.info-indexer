@@ -3,7 +3,19 @@ import { v4 as uuid } from 'uuid';
 
 export const titles = sqliteTable('titles', {
     id: text('id').primaryKey().$defaultFn(() => uuid()),
+    tmdbId: text('tmdb_id'),
     imdbId: text('imdb_id'),
+})
+
+export const all_metadata = sqliteTable('all_metadata', {
+    id: text('id').primaryKey().$defaultFn(() => uuid()),
+    titleId: text('title_id').references(() => titles.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    adult: integer('adult').notNull(),
+    backdropUrl: text('backdrop_url').notNull(),
+    language: text('language').notNull(),
+    posterUrl: text('poster_url').notNull(),
+    genres: text('genres'),
 })
 
 export const pages = sqliteTable('pages', {

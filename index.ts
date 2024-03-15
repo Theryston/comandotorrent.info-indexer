@@ -22,7 +22,7 @@ async function main() {
                 .select({ id: pages.id })
                 .from(pages)
                 .where(eq(pages.url, page));
-            3723
+
             if (alreadyIndexedPages.length) {
                 logger(`Page ${page} already indexed`)
                 continue
