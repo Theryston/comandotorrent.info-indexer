@@ -34,12 +34,12 @@ export default async function handlePage(page: string) {
 
         if (!dbTitles.length) {
             let tmdbInfo = null;
-            if (info.imdbId) {
-                const { data } = await axios.get(`https://api.themoviedb.org/3/find/${info.imdbId}?api_key=${process.env.TMDB_API_KEY}&external_source=imdb_id&language=${process.env.LANGUAGE || 'en'}`);
+            if (info.name) {
+                const { data } = await axios.get(`https://api.themoviedb.org/3/search/multi?query=${info.name}&api_key=${process.env.TMDB_API_KEY}&language=${process.env.LANGUAGE || 'en'}`);
                 tmdbInfo = data
             }
 
-            const metadata = tmdbInfo?.movie_results[0] || tmdbInfo?.tv_results[0]
+            const metadata = tmdbInfo?.results[0]
 
             dbTitles = await db
                 .insert(titles)
