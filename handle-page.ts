@@ -49,6 +49,10 @@ export default async function handlePage(page: string) {
                 });
 
             if (metadata) {
+                const apiUrl = metadata.media_type === 'movie' ? `https://api.themoviedb.org/3/movie/${metadata.id}` : `https://api.themoviedb.org/3/tv/${metadata.id}`;
+
+                const { data } = await axios.get(`${apiUrl}?api_key=${process.env.TMDB_API_KEY}&language=${process.env.LANGUAGE || 'en'}`);
+
                 await db
                     .insert(all_metadata)
                     .values({
@@ -56,9 +60,9 @@ export default async function handlePage(page: string) {
                         name: metadata.title || metadata.name,
                         adult: metadata.adult ? 1 : 0,
                         backdropUrl: `https://image.tmdb.org/t/p/original${metadata.backdrop_path}`,
-                        genres: metadata.genres ? metadata.genres.map((genre: any) => genre.name).join(',') : null,
                         language: process.env.LANGUAGE || 'en',
-                        posterUrl: `https://image.tmdb.org/t/p/original${metadata.poster_path}`
+                        posterUrl: `https://image.tmdb.org/t/p/original${metadata.poster_path}`,
+                        genres: data.genres?.map((genre: any) => genre.name).join(' | ')
                     });
             }
         }
