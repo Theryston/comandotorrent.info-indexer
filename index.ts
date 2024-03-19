@@ -7,12 +7,16 @@ import getPostSitemap from "./get-post-sitemap"
 import handlePage from "./handle-page";
 import logger from "./logger";
 import { promise as fastq } from "fastq";
+import moment from "moment";
+import { changeState } from "./state";
 
 const queue = fastq(handlePage, CONCURRENT_HANDLE_PAGE)
 
 async function main() {
+    await changeState({ isWaiting: true });
     logger(`Getting all sitemaps from ${SITEMAP_INDEX}`);
     const postSitemaps = await getPostSitemap(SITEMAP_INDEX);
+    await changeState({ isWaiting: false });
 
     for (const postSitemap of postSitemaps) {
         const gotPages = await getPagesFromPostSitemap(postSitemap);
@@ -38,6 +42,10 @@ async function main() {
         .from(pages)
         .where(or(eq(pages.status, 0), eq(pages.status, 2)));
 
+    let averageTime = 0;
+    let estimatedTimeToFinish = 0;
+    let totalTime = 0;
+    let totalProcessedPages = 0;
     for (let i = 0; i < indexedPendingPages.length; i++) {
         const page = indexedPendingPages[i]
 
@@ -45,12 +53,21 @@ async function main() {
             continue
         }
 
+        let start = Date.now();
         queue.push(page.url)
-            .then(() => {
-                logger(`Torrents from page ${i + 1} of ${indexedPendingPages.length} indexed`)
-            })
             .catch(error => {
-                logger(`Error on page ${page.url}\n: ${error.message}`)
+                logger(`Error on page ${i + 1}: ${error.message}`)
+            }).finally(() => {
+                const end = Date.now();
+                totalProcessedPages++;
+                totalTime += end - start;
+                averageTime = totalTime / totalProcessedPages
+                estimatedTimeToFinish = Math.round((averageTime * (indexedPendingPages.length - totalProcessedPages)) / CONCURRENT_HANDLE_PAGE)
+
+                const averageTimeFormatted = moment.utc(averageTime).format('HH [hours] mm [minutes] ss [seconds]')
+                const estimatedTimeToFinishFormatted = moment.utc(estimatedTimeToFinish).format('HH [hours] mm [minutes] ss [seconds]')
+
+                logger(`Processed ${totalProcessedPages} of ${indexedPendingPages.length} pages. Average time: ${averageTimeFormatted}. Estimated time to finish: ${estimatedTimeToFinishFormatted}`)
             })
     }
 }
