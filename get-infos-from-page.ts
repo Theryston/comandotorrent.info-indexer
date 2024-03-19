@@ -26,7 +26,7 @@ export default async function getInfosFromPage(page: string) {
     }
 
     const torrentsStr = await aiProcess({
-        system: "Search for all magnet links in this HTML and form an array of data in the format: \n\n[{\n    \"magnetUri\": \"magnet:?xt=urn:btih...\", // This is the link itself\n    \"title\": \"BluRay...\" // This is the text that is close to the magnet on the DOM. Please rewrite it better for understanding in pt-BR\n}]\n\nYou are a system, so just return the code in a pure text (no markdown, no js, nothing, just JSON sting without breaking lines or sintax error)",
+        system: `Search for all magnet links in this HTML and form an array of data in the format: \n\n[{\n    "magnetUri": "magnet:?xt=urn:btih...", // This is the link itself\n    "title\": "BluRay..." // This is the text that is close to the magnet on the DOM. Please rewrite it better for understanding in ${process.env.LANGUAGE || "en"}\n}]\n\nYou are a system, so just return the code in a pure text (no markdown, no js, nothing, just JSON sting without breaking lines or sintax error)`,
         messages: [{ text: article }]
     });
     const torrents = JSON.parse(torrentsStr).map((torrent: any) => ({ magnet: torrent.magnetUri, torrentTitle: torrent.title }));
