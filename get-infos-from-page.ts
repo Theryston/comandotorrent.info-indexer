@@ -1,10 +1,6 @@
 import cheerio from 'cheerio';
 import client from './client';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+import aiProcess from './ai-process';
 
 export default async function getInfosFromPage(page: string) {
     const { data: html } = await client.get(page, {
@@ -40,12 +36,10 @@ export default async function getInfosFromPage(page: string) {
         })
     }
 
-    const nameRes = await openai.completions.create({
-        model: 'gpt-3.5-turbo-instruct',
-        prompt: `Give me the movie or tv show title (only the title) from this text: ${title}\nTitle: `,
+    const name = await aiProcess({
+        system: 'Give me the movie or tv show title (only the title) from the text',
+        messages: [{ text: title }]
     })
-
-    const name = nameRes.choices[0].text.trim();
 
     return {
         name,

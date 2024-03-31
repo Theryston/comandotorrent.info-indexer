@@ -1,6 +1,11 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { v4 as uuid } from 'uuid';
 
+export const state = sqliteTable('state', {
+    id: text('id').primaryKey().$defaultFn(() => uuid()),
+    isWaiting: integer('is_waiting').notNull().default(0),
+})
+
 export const titles = sqliteTable('titles', {
     id: text('id').primaryKey().$defaultFn(() => uuid()),
     tmdbId: text('tmdb_id'),

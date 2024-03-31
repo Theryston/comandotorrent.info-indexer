@@ -15,6 +15,13 @@
       "when": 1710522570154,
       "tag": "0001_sloppy_tomas",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1711891816470,
+      "tag": "0002_next_deathstrike",
+      "breakpoints": true
     }
   ]
 }
