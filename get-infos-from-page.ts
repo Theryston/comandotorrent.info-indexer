@@ -36,14 +36,14 @@ export default async function getInfosFromPage(page: string) {
         })
     }
 
-    let name = await aiProcess({
+    let textId = await aiProcess({
         system: 'Give me the movie or tv show title and year in a unique text (like: "Lord of the Rings, 2001") from the text',
         messages: [{ text: title }]
     })
-    name = name.replaceAll('"', '');
+    textId = textId.replaceAll('"', '');
 
     return {
-        name,
+        textId,
         imdbId,
         pageTitle: title,
         torrents

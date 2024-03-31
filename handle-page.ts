@@ -34,7 +34,7 @@ export default async function handlePage(page: string) {
         }
 
         if (!dbTitles.length) {
-            const metadata = info.name ? await findMetadataByTextId(info.name) : null;
+            const metadata = await findMetadataByTextId(info.textId);
 
             dbTitles = await db
                 .insert(titles)
@@ -52,7 +52,7 @@ export default async function handlePage(page: string) {
                     .insert(all_metadata)
                     .values({
                         titleId: dbTitles[0].id,
-                        name: metadata.title || metadata.name,
+                        name: (metadata.title || metadata.name) as string,
                         adult: metadata.adult ? 1 : 0,
                         backdropUrl: `https://image.tmdb.org/t/p/original${metadata.backdrop_path}`,
                         language: process.env.LANGUAGE || 'en',
