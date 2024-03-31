@@ -4,6 +4,7 @@ import { all_metadata, pages, titles, torrents } from "./db/schema";
 import logger from "./logger";
 import getInfosFromPage from "./get-infos-from-page";
 import axios from "axios";
+import findMetadataByTextId from "./find-metadata-by-name";
 
 export default async function handlePage(page: string) {
     try {
@@ -33,13 +34,7 @@ export default async function handlePage(page: string) {
         }
 
         if (!dbTitles.length) {
-            let tmdbInfo = null;
-            if (info.name) {
-                const { data } = await axios.get(`https://api.themoviedb.org/3/search/multi?query=${info.name}&api_key=${process.env.TMDB_API_KEY}&language=${process.env.LANGUAGE || 'en'}`);
-                tmdbInfo = data
-            }
-
-            const metadata = tmdbInfo?.results[0]
+            const metadata = info.name ? await findMetadataByTextId(info.name) : null;
 
             dbTitles = await db
                 .insert(titles)

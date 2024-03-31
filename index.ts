@@ -7,10 +7,13 @@ import getPostSitemap from "./get-post-sitemap"
 import handlePage from "./handle-page";
 import logger from "./logger";
 import { promise as fastq } from "fastq";
+import { changeState } from "./state";
 
 const queue = fastq(handlePage, CONCURRENT_HANDLE_PAGE)
 
 async function main() {
+    await changeState({ isWaiting: false })
+
     logger(`Getting all sitemaps from ${SITEMAP_INDEX}`);
     const postSitemaps = await getPostSitemap(SITEMAP_INDEX);
 
